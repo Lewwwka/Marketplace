@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List
-from sqlalchemy import ForeignKey, Integer, String, DateTime, Boolean, BigInteger
+from sqlalchemy import ForeignKey, Integer, String, DateTime, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -32,7 +32,7 @@ class Product(Base):
 
     name: Mapped[str] = mapped_column(String, nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(String)
-    price: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    price: Mapped[int] = mapped_column(Integer, nullable=False)
     stock: Mapped[int] = mapped_column(Integer, default=0)
     seller_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
