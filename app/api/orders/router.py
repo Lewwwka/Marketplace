@@ -7,6 +7,7 @@ from app.db.models import User
 from app.api.dependencies import get_current_user
 from .schemas import OrderCreate, OrderOut
 from .repository import OrderRepository
+from celery_tasks.tasks import process_order
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
@@ -24,11 +25,15 @@ async def add_to_cart(
 
 @router.post("/", response_model=OrderOut, status_code=201)
 async def create_order(
+    cart_data: OrderCreate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     repo = OrderRepository(db)
     order = await repo.create_order(current_user.id)
+
+    process_order.delay(order.id)
+
     return order
 
 
