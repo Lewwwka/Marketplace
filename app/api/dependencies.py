@@ -1,10 +1,10 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from db.models import User
-from db.database import get_db
-from core.security import verify_token
-from core.exceptions import ForbiddenException
+from app.db.models import User
+from app.db.database import get_db
+from app.core.security import verify_token
+from app.core.exceptions import ForbiddenException
 
 security = HTTPBearer()
 

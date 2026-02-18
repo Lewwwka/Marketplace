@@ -2,8 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import Optional
 
-from db.models import User
-from core.security import get_password_hash
+from app.db.models import User
+from app.core.security import get_password_hash
 
 
 class UserRepository:

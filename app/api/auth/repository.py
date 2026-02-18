@@ -2,8 +2,8 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from db.models import User
-from core.security import verify_password
+from app.db.models import User
+from app.core.security import verify_password
 
 
 class AuthRepository:

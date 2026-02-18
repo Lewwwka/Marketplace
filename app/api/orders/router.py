@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
-from db.database import get_db
-from db.models import User
-from api.dependencies import get_current_user
+from app.db.database import get_db
+from app.db.models import User
+from app.api.dependencies import get_current_user
 from .schemas import OrderCreate, OrderOut
 from .repository import OrderRepository
 

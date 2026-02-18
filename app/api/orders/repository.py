@@ -1,12 +1,15 @@
+import redis.asyncio as redis
+from redis.asyncio import Redis
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
 
-from aioredis import from_url
-from db.models import Order, OrderItem, Product
-from core.config import settings
 
-redis = from_url(settings.REDIS_URL)
+from app.db.models import Order, OrderItem, Product
+from app.core.config import settings
+
+redis: Redis = redis.from_url(settings.REDIS_URL)
 
 
 class OrderRepository:
