@@ -1,15 +1,10 @@
-import redis.asyncio as redis
-from redis.asyncio import Redis
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
 
 
 from app.db.models import Order, OrderItem, Product
-from app.core.config import settings
-
-redis: Redis = redis.from_url(settings.REDIS_URL)
+from app.core.redus_client import get_redis
 
 
 class OrderRepository:
@@ -17,20 +12,23 @@ class OrderRepository:
         self.db = db
 
     async def create_cart(self, user_id: int, items: List[dict]) -> None:
+        redis_client = await get_redis()
         cart_key = f"cart:{user_id}"
-        pipe = redis.pipeline()
+        pipe = redis_client.pipeline()
         for item in items:
-            await pipe.hset(cart_key, str(item["product_id"]), item["quantity"])
+            pipe.hset(cart_key, str(item["product_id"]), item["quantity"])
         await pipe.execute()
 
     async def get_cart(self, user_id: int) -> List[dict]:
+        redis_client = await get_redis()
         cart_key = f"cart:{user_id}"
-        items = await redis.hgetall(cart_key)
+        items = await redis_client.hgetall(cart_key)
         return [{"product_id": int(k), "quantity": int(v)} for k, v in items.items()]
 
     async def clear_cart(self, user_id: int) -> None:
+        redis_client = await get_redis()
         cart_key = f"cart:{user_id}"
-        await redis.delete(cart_key)
+        await redis_client.delete(cart_key)
 
     async def create_order(self, user_id: int) -> Order:
         cart = await self.get_cart(user_id)
