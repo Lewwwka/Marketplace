@@ -7,7 +7,7 @@ from app.db.models import User
 from app.api.dependencies import get_current_user
 from .schemas import OrderCreate, OrderOut
 from .repository import OrderRepository
-from celery_tasks.tasks import process_order
+from app.celery_tasks.tasks import process_order
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
