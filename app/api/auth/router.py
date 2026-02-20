@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import UnauthorizedException
 from app.db.database import get_db
 from app.core.security import create_access_token
-from .schemas import LoginRequest, LoginResponse
-from .repository import AuthRepository
+from app.api.auth.schemas import LoginRequest, LoginResponse
+from app.api.auth.repository import AuthRepository
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -15,10 +16,7 @@ async def login(form_data: LoginRequest, db: AsyncSession = Depends(get_db)):
     user = await repo.authenticate(form_data.email, form_data.password)
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Неправильный email или пароль",
-        )
+        raise UnauthorizedException()
 
     access_token = create_access_token(user.email)
 

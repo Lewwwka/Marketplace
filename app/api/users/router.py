@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import AlredyRegisterException
 from app.db.database import get_db
 from app.api.dependencies import get_current_user
 from app.db.models import User
@@ -15,7 +16,7 @@ async def create_user(user_data: UserCreate, db: AsyncSession = Depends(get_db))
     repo = UserRepository(db)
     existing = await repo.get_by_email(user_data.email)
     if existing:
-        raise HTTPException(400, "Этот email уже зарегистрирован")
+        raise AlredyRegisterException()
 
     user = await repo.create(user_data.email, user_data.password, user_data.full_name)
     return user

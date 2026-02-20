@@ -5,8 +5,8 @@ from typing import List
 from app.db.database import get_db
 from app.db.models import User
 from app.api.dependencies import get_current_user
-from .schemas import OrderCreate, OrderOut
-from .repository import OrderRepository
+from app.api.orders.schemas import OrderCreate, OrderOut
+from app.api.orders.repository import OrderRepository
 from app.celery_tasks.tasks import process_order
 
 router = APIRouter(prefix="/orders", tags=["orders"])

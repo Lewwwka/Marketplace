@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
+from app.core.exceptions import NotFoundException
 from app.db.database import get_db
 from app.db.models import User
 from app.api.dependencies import get_current_user
-from .schemas import ProductCreate, ProductOut
-from .repository import ProductRepository
+from app.api.products.schemas import ProductCreate, ProductOut
+from app.api.products.repository import ProductRepository
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -36,5 +37,5 @@ async def get_product(product_id: int, db: AsyncSession = Depends(get_db)):
     repo = ProductRepository(db)
     product = await repo.get(product_id)
     if not product:
-        raise HTTPException(404, "Товар не найден")
+        raise NotFoundException(product)
     return product
