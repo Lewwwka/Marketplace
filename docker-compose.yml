@@ -18,7 +18,6 @@ services:
     volumes:
       - redis_data:/data
 
-  
   migrate:
     build: .
     command: sh -c "uv run alembic upgrade head"
@@ -57,7 +56,6 @@ services:
       - .env  
     depends_on:
       - postgres
-      - rabbitmq 
     command: sh -c "uv run uvicorn app.main:app --host 0.0.0.0 --port 8000"
     expose:
       - "8000"

@@ -21,10 +21,6 @@ class UserRepository:
         result = await self.db.execute(select(User).where(User.email == email))
         return result.scalar_one_or_none()
 
-    async def get(self, user_id: int) -> Optional[User]:
-        result = await self.db.execute(select(User).where(User.id == user_id))
-        return result.scalar_one_or_none()
-
     async def update(self, user: User, **kwargs) -> User:
         if "password" in kwargs:
             kwargs["hashed_password"] = get_password_hash(kwargs.pop("password"))
@@ -33,5 +29,5 @@ class UserRepository:
         await self.db.flush()
         return user
 
-    async def delete(self, user: User) -> None:
+    async def delete_me(self, user: User) -> None:
         await self.db.delete(user)
