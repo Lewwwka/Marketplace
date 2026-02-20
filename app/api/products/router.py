@@ -24,18 +24,21 @@ async def create_product(
 
 
 @router.get("/", response_model=List[ProductOut])
-async def list_products(
-    skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)
-):
+async def get_list_all_products(db: AsyncSession = Depends(get_db)):
     repo = ProductRepository(db)
-    products = await repo.get_multi(skip=skip, limit=limit)
+    products = await repo.get_all()
+    if not products:
+        raise NotFoundException("Продуктов")
     return products
 
 
-@router.get("/{product_id}", response_model=ProductOut)
-async def get_product(product_id: int, db: AsyncSession = Depends(get_db)):
+@router.get("/{product_name}", response_model=List[ProductOut])
+async def get_list_by_product_name(
+    product_name: str,
+    db: AsyncSession = Depends(get_db),
+):
     repo = ProductRepository(db)
-    product = await repo.get(product_id)
-    if not product:
-        raise NotFoundException(product)
-    return product
+    products = await repo.get_by_name(product_name)
+    if not products:
+        raise NotFoundException(f"Продуктов с названием: {product_name}")
+    return products

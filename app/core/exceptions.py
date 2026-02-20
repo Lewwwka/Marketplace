@@ -12,7 +12,7 @@ class AlredyRegisterException(HTTPException):
 class NotFoundException(HTTPException):
     def __init__(self, entity: str):
         super().__init__(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"{entity} не найден"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"{entity} не найдено"
         )
 
 

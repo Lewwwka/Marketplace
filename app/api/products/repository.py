@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from typing import List, Optional
+from typing import List
 
 from app.db.models import Product
 
@@ -16,18 +16,16 @@ class ProductRepository:
         await self.db.flush()
         return product
 
-    async def get(self, product_id: int) -> Optional[Product]:
+    async def get_all(self) -> List[Product]:
         result = await self.db.execute(
-            select(Product).where(Product.id == product_id, Product.is_active is True)
+            select(Product).order_by(Product.created_at.desc())
         )
-        return result.scalar_one_or_none()
+        return result.scalars().all()
 
-    async def get_multi(self, skip: int = 0, limit: int = 100) -> List[Product]:
+    async def get_by_name(self, product_name: str) -> List[Product]:
         result = await self.db.execute(
             select(Product)
-            .where(Product.is_active is True)
-            .offset(skip)
-            .limit(limit)
+            .where(Product.name == product_name)
             .order_by(Product.created_at.desc())
         )
         return result.scalars().all()
