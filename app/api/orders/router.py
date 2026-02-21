@@ -8,7 +8,7 @@ from app.db.models import User
 from app.api.dependencies import get_current_user, get_redis_client
 from app.api.orders.schemas import OrderCreate, OrderItem, OrderOut
 from app.api.orders.repository import OrderRepository
-from app.celery_tasks.tasks import process_order
+# from app.celery_tasks.tasks import process_order
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
@@ -36,6 +36,17 @@ async def list_basket(
     return orders
 
 
+@router.delete("/basket", status_code=201)
+async def delete_basket(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    redis_client: redis.Redis = Depends(get_redis_client),
+):
+    repo = OrderRepository(db, redis_client)
+    await repo.clear_basket(current_user.id)
+    return {"message": "Корзина очищена"}
+
+
 @router.post("/", response_model=OrderOut, status_code=201)
 async def create_order(
     current_user: User = Depends(get_current_user),
@@ -44,8 +55,8 @@ async def create_order(
 ):
     repo = OrderRepository(db, redis_client)
     order = await repo.create_order(current_user.id)
-
-    process_order.delay(order.id)
+    await db.refresh(order, ["items"])
+    # process_order.delay(order.id)
 
     return order
 
@@ -57,5 +68,5 @@ async def list_orders(
     redis_client: redis.Redis = Depends(get_redis_client),
 ):
     repo = OrderRepository(db, redis_client)
-    orders = await repo.get_multi(user_id=current_user.id)
+    orders = await repo.get_all_orders(current_user.id)
     return orders

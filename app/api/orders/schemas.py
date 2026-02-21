@@ -18,6 +18,8 @@ class OrderItemOut(BaseModel):
     quantity: int
     price: int
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class OrderOut(BaseModel):
     id: int

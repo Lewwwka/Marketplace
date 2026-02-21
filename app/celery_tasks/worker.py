@@ -11,7 +11,3 @@ app.conf.update(
     result_serializer="json",
     enable_utc=True,
 )
-
-
-if __name__ == "__main__":
-    app.start()

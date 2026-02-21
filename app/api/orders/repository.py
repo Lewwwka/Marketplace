@@ -3,6 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
 
+from sqlalchemy.orm import selectinload
+
 
 from app.db.models import Order, OrderItem, Product
 
@@ -61,14 +63,11 @@ class OrderRepository:
         await self.clear_basket(user_id)
         return order
 
-    async def get_multi(
-        self, user_id: int, skip: int = 0, limit: int = 100
-    ) -> List[Order]:
+    async def get_all_orders(self, user_id: int) -> List[Order]:
         result = await self.db.execute(
             select(Order)
             .where(Order.user_id == user_id)
+            .options(selectinload(Order.items))
             .order_by(Order.created_at.desc())
-            .offset(skip)
-            .limit(limit)
         )
         return result.scalars().all()

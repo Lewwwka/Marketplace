@@ -18,6 +18,11 @@ services:
     volumes:
       - redis_data:/data
 
+  redisinsight:
+    image: redis/redisinsight
+    ports:
+      - "5540:5540"
+
   migrate:
     build: .
     command: sh -c "uv run alembic upgrade head"
