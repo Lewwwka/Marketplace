@@ -1,6 +1,6 @@
 import redis.asyncio as redis
 
-from ..core.config import settings
+from app.core.config import settings
 
 
 redis_client: redis.Redis | None = None

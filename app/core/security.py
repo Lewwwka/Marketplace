@@ -32,14 +32,12 @@ def create_access_token(subject: str, expires_delta: Optional[timedelta] = None)
     return encoded_jwt
 
 
-async def verify_token(token: str) -> Optional[str]:
+async def verify_token(token: str) -> dict | None:
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
-        email: str = payload.get("sub")
-        if email is None:
-            return None
-        return email
+        payload["sub"]
+        return payload
     except JWTError:
         return None

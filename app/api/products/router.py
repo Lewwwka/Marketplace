@@ -28,7 +28,7 @@ async def get_list_all_products(db: AsyncSession = Depends(get_db)):
     repo = ProductRepository(db)
     products = await repo.get_all()
     if not products:
-        raise NotFoundException("Продуктов")
+        raise NotFoundException("Товаров")
     return products
 
 
@@ -40,5 +40,5 @@ async def get_list_by_product_name(
     repo = ProductRepository(db)
     products = await repo.get_by_name(product_name)
     if not products:
-        raise NotFoundException(f"Продуктов с названием: {product_name}")
+        raise NotFoundException(f'Товаров с названием "{product_name}" ')
     return products
