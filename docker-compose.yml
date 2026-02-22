@@ -42,16 +42,15 @@ services:
       - "5672:5672"
       - "15672:15672"
 
-  celery_worker:
+  celery:
     build: .
-    command: uv run celery -A app.celery_tasks.worker worker --loglevel=info
+    command: uv run celery -A app.celery_tasks.celery:celery_app worker --loglevel=info
     env_file: .env 
     environment:
       BROKER_URL: ${RABBITMQ_URL}
     depends_on:
-      - redis
       - rabbitmq
-      - postgres
+      - redis
 
   app:
     build: .
@@ -61,6 +60,7 @@ services:
       - .env  
     depends_on:
       - postgres
+      - redis
     command: sh -c "uv run uvicorn app.main:app --host 0.0.0.0 --port 8000"
     expose:
       - "8000"

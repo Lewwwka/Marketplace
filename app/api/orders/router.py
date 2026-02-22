@@ -8,7 +8,7 @@ from app.db.models import User
 from app.api.dependencies import get_current_user, get_redis_client
 from app.api.orders.schemas import OrderCreate, OrderItem, OrderOut
 from app.api.orders.repository import OrderRepository
-# from app.celery_tasks.tasks import process_order
+from app.celery_tasks.tasks import process_order
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
@@ -56,8 +56,7 @@ async def create_order(
     repo = OrderRepository(db, redis_client)
     order = await repo.create_order(current_user.id)
     await db.refresh(order, ["items"])
-    # process_order.delay(order.id)
-
+    process_order.delay(order.id)
     return order
 
 

@@ -14,7 +14,10 @@ async_engine = create_async_engine(
     echo=True,
 )
 
-SessionLocal = sessionmaker(sync_engine)
+SessionLocal = sessionmaker(
+    bind=sync_engine,
+    expire_on_commit=False,
+)
 
 AsyncSessionLocal = sessionmaker(
     bind=async_engine,
@@ -33,3 +36,15 @@ async def get_db():
             raise
         finally:
             await session.close()
+
+
+def get_sync_db():
+    db = SessionLocal()
+    try:
+        yield db
+        db.commit()
+    except:
+        db.rollback()
+        raise
+    finally:
+        db.close()

@@ -18,7 +18,15 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     ALGORITHM: str
 
-    model_config = SettingsConfigDict(env_file=".env")
+    EMAIL_FROM: str
+    EMAIL_PASSWORD: str
+    SMTP_HOST: str
+    SMTP_PORT: int
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
 
 settings = Settings()
