@@ -5,14 +5,14 @@ from httpx import AsyncClient
 @pytest.mark.asyncio
 async def test_create_user(client: AsyncClient):
     user_data = {
-        "email": "user@example.com",
+        "email": "user2@example.com",
         "full_name": "string",
         "password": "stringst",
     }
     response = await client.post("/users/", json=user_data)
     assert response.status_code == 201
     data = response.json()
-    assert data["email"] == "user@example.com"
+    assert data["email"] == "user2@example.com"
 
 
 @pytest.mark.asyncio
@@ -31,11 +31,11 @@ async def test_create_user_duplicate(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_update_user(client: AsyncClient):
     user_data = {
-        "email": "user2@example.com",
-        "full_name": "string2",
-        "password": "stringst2",
+        "email": "user3@example.com",
+        "full_name": "string3",
+        "password": "stringst3",
     }
     response = await client.post("/users/", json=user_data)
     assert response.status_code == 201
     data = response.json()
-    assert data["email"] == "user2@example.com"
+    assert data["email"] == "user3@example.com"

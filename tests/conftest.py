@@ -59,3 +59,28 @@ async def client(db_session):
         yield ac
 
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
+async def logged_in_token(client: AsyncClient):
+
+    login_data = {
+        "email": "user@example.com",
+        "password": "stringst",
+    }
+
+    response = await client.post("/auth/login", json=login_data)
+    assert response.status_code == 200
+
+    return response.json()["access_token"]
+
+
+@pytest_asyncio.fixture
+async def auth_client(client: AsyncClient, logged_in_token: str):
+
+    headers = {"Authorization": f"Bearer {logged_in_token}"}
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test", headers=headers
+    ) as ac:
+        yield ac
