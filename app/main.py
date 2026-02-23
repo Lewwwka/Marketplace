@@ -5,6 +5,7 @@ from app.api.auth.router import router as auth_router
 from app.api.users.router import router as users_router
 from app.api.orders.router import router as orders_router
 from app.api.products.router import router as product_router
+
 from app.core.middleware import ErrorHandlingMiddleware, TimingMiddleware
 from app.core.redus_client import init_redis, close_redis
 
