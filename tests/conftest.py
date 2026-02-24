@@ -1,5 +1,4 @@
 import asyncio
-
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
@@ -9,6 +8,7 @@ from app.main import app
 from app.db.database import get_db
 from app.db.models import Base
 from app.core.config import settings
+from app.api.dependencies import get_redis_client
 
 
 @pytest.fixture(scope="session")
@@ -31,30 +31,29 @@ async def setup_db_once():
 
 
 @pytest_asyncio.fixture
-async def db_session():
-
-    engine = create_async_engine(settings.DATABASE_ASYNC_URL)
-    async_session = async_sessionmaker(engine, expire_on_commit=False)
-
-    async with engine.begin() as conn:
-        session = async_session(bind=conn)
-        try:
-            yield session
-        finally:
-            await session.close()
-            await engine.dispose()
-
-
-@pytest_asyncio.fixture
-async def client(db_session):
+async def client():
 
     async def override_get_db():
-        yield db_session
+        engine = create_async_engine(settings.DATABASE_ASYNC_URL)
+        async_session = async_sessionmaker(engine, expire_on_commit=False)
+
+        async with async_session() as session:
+            try:
+                yield session
+                await session.commit()
+            except:
+                await session.rollback()
+                raise
+            finally:
+                await session.close()
+
+        await engine.dispose()
 
     app.dependency_overrides[get_db] = override_get_db
 
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
+        transport=ASGITransport(app=app),
+        base_url="http://test",
     ) as ac:
         yield ac
 
@@ -76,11 +75,38 @@ async def logged_in_token(client: AsyncClient):
 
 
 @pytest_asyncio.fixture
-async def auth_client(client: AsyncClient, logged_in_token: str):
+async def auth_client(logged_in_token: str):
+
+    class RedisMock:
+        def pipeline(self):
+
+            class Pipe:
+                def hset(self, *args):
+                    return self
+
+                def expire(self, *args):
+                    return self
+
+                async def execute(self):
+                    return [True, True, True]
+
+            return Pipe()
+
+        async def hgetall(self, key):
+            return {b"1": b"2"}
+
+        async def delete(self, key):
+            return 1
+
+    app.dependency_overrides[get_redis_client] = lambda: RedisMock()
 
     headers = {"Authorization": f"Bearer {logged_in_token}"}
 
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test", headers=headers
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+        headers=headers,
     ) as ac:
         yield ac
+
+    app.dependency_overrides.clear()
