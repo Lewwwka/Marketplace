@@ -45,7 +45,10 @@ cd marketplace
 cp .env.example .env
 
 ```
-* Отредактируй пароли в .env: 
+* Отредактируй пароли в .env:
+- SECRET_KEY="JWT KEY"
+- EMAIL_FROM="Email с которого будут приходить сообщения"
+- EMAIL_PASSWORD="Пароль приложений"
 * Для отправки уведомлений необходимо создать пароль приложений gmail: https://myaccount.google.com/apppasswords
 
 Запуск проекта
